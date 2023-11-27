@@ -15,7 +15,6 @@ fondo_nivel_ranking = pygame.image.load("imagenes/fondo_nivel.png")
 fondo_nivel_ranking = pygame.transform.scale(fondo_nivel_ranking, (ANCHO_VENTANA, ALTO_VENTANA))
 
 class Ventana:
-    dict_ventana_activa = {}    #creo un diccionario antes de crear el constructor. Ahora todas las clases van a compartir este diccionario en el mismo espacio de memoria
     def __init__(self):
         self.fuente = pygame.font.SysFont("8-bit-pusab.ttf", 80)
         self.fuente_pausa = pygame.font.SysFont("8-bit-pusab.ttf", 170)
@@ -27,11 +26,11 @@ class Ventana:
 class Ventana_principal(Ventana):
     def __init__(self) -> None:
         super().__init__()
-        self.texto_titulo_elegir_nivel = self.fuente.render('Elegir nivel (0-9)', True, COLOR_ROSA)
-        self.rect_texto_titulo_elegir_nivel = pygame.Rect((50, 820), (290,35))
+        self.texto_titulo_seleccionar_nivel = self.fuente.render('Seleccionar nivel', True, COLOR_ROSA)
+        self.rect_texto_titulo_seleccionar_nivel = pygame.Rect((50, 820), (290,35))
 
         self.texto_titulo_ranking = self.fuente.render('Ranking', True, COLOR_ROSA)
-        self.rect_texto_titulo_ranking = pygame.Rect((600, 820), (290,35))
+        self.rect_texto_titulo_ranking = pygame.Rect((650, 820), (290,35))
 
         self.texto_titulo_salir = self.fuente.render('Salir', True, COLOR_ROSA)
         self.rect_texto_titulo_salir = pygame.Rect((1050, 820), (290,35))
@@ -40,16 +39,14 @@ class Ventana_principal(Ventana):
     def dibujar(self, pantalla):
         pantalla.blit(fondo_principal, (0,0))
 
-        pantalla.blit(self.texto_titulo_elegir_nivel,(50, 820))
-        pantalla.blit(self.texto_titulo_ranking,(620, 820))
+        pantalla.blit(self.texto_titulo_seleccionar_nivel,(50, 820))
+        pantalla.blit(self.texto_titulo_ranking,(650, 820))
         pantalla.blit(self.texto_titulo_salir,(1050, 820))
 
 class Ventana_nivel(Ventana):
     def __init__(self) -> None:
         super().__init__() 
 
-        
-         
     def dibujar(self, personaje, lista_cajas, lista_paredes, lista_objetivos, lista_pisos, pantalla, ventana_activa, contador_segundos):
         pantalla.fill(COLOR_NEGRO)
         pantalla.blit(fondo_nivel_ranking, (0,0))
@@ -72,8 +69,9 @@ class Ventana_nivel(Ventana):
         pantalla.blit(texto_movimientos, (30, 910))
         texto_timer = self.fuente_barra_datos.render(str(f'Tiempo: {contador_segundos}'), True, COLOR_NEGRO)
         pantalla.blit(texto_timer, (610, 910))
+
         self.puntaje_movimientos = (personaje.movimientos)
-        self.puntaje_tiempo = (500 - contador_segundos)
+        self.puntaje_tiempo = (1350 - contador_segundos)
         self.puntaje_total = int(self.puntaje_movimientos + self.puntaje_tiempo)
         texto_puntaje = self.fuente_barra_datos.render(str(f'Score: {self.puntaje_total}'), True, COLOR_NEGRO)
         pantalla.blit(texto_puntaje, (1100, 910))
@@ -81,6 +79,55 @@ class Ventana_nivel(Ventana):
         if caja.todas_en_objetivo(lista_cajas, lista_objetivos):
             ventana_activa = "nivel_completado"
         return ventana_activa
+
+class Ventana_seleccion_nivel(Ventana):
+    def __init__(self):
+        super().__init__()
+
+        self.seleccion_niveles = self.fuente_pausa.render('SELECCION DE NIVEL', True, COLOR_ROSA)
+
+        self.nivel_0 = self.fuente.render(f'Nivel 0', True, COLOR_ROSA)
+        self.nivel_1 = self.fuente.render(f'Nivel 1', True, COLOR_ROSA)
+        self.nivel_2 = self.fuente.render(f'Nivel 2', True, COLOR_ROSA)
+        self.nivel_3 = self.fuente.render(f'Nivel 3', True, COLOR_ROSA)
+        self.nivel_4 = self.fuente.render(f'Nivel 4', True, COLOR_ROSA)
+        self.nivel_5 = self.fuente.render(f'Nivel 5', True, COLOR_ROSA)
+        self.nivel_6 = self.fuente.render(f'Nivel 6', True, COLOR_ROSA)
+        self.nivel_7 = self.fuente.render(f'Nivel 7', True, COLOR_ROSA)
+        self.nivel_8 = self.fuente.render(f'Nivel 8', True, COLOR_ROSA)
+        self.nivel_9 = self.fuente.render(f'Nivel 9', True, COLOR_ROSA)
+
+        self.rect_nivel_0 = pygame.Rect((70, 300), (150, 70))
+        self.rect_nivel_1 = pygame.Rect((570, 300), (150, 70))
+        self.rect_nivel_2 = pygame.Rect((1070, 300), (150, 70))
+        self.rect_nivel_3 = pygame.Rect((70, 500), (150, 70))
+        self.rect_nivel_4 = pygame.Rect((570, 500), (150, 70))
+        self.rect_nivel_5 = pygame.Rect((1070, 500), (150, 70))
+        self.rect_nivel_6 = pygame.Rect((70, 700), (150, 70))
+        self.rect_nivel_7 = pygame.Rect((570, 700), (150, 70))
+        self.rect_nivel_8 = pygame.Rect((1070, 700), (150, 70))
+        self.rect_nivel_9 = pygame.Rect((570, 900), (150, 70))
+
+        self.texto_volver = self.fuente_barra_datos.render('Volver', True, COLOR_ROSA)
+        self.rect_texto_volver = pygame.Rect((1200, 900), (100, 50))
+
+        self.lista_rects = [self.rect_nivel_0, self.rect_nivel_1, self.rect_nivel_2, self.rect_nivel_3, self.rect_nivel_4, self.rect_nivel_5, self.rect_nivel_6, self.rect_nivel_7, self.rect_nivel_8, self.rect_nivel_9]
+    
+    def dibujar(self, pantalla):
+        pantalla.blit(fondo_nivel_ranking, (0,0))
+        pantalla.blit(self.seleccion_niveles,(60, 100))
+        pantalla.blit(self.texto_volver, (1200, 900))
+
+        pantalla.blit(self.nivel_0,(70, 300))
+        pantalla.blit(self.nivel_1,(570, 300))
+        pantalla.blit(self.nivel_2,(1070, 300))
+        pantalla.blit(self.nivel_3,(70, 500))
+        pantalla.blit(self.nivel_4,(570, 500))
+        pantalla.blit(self.nivel_5,(1070, 500))
+        pantalla.blit(self.nivel_6,(70, 700))
+        pantalla.blit(self.nivel_7,(570, 700))
+        pantalla.blit(self.nivel_8,(1070, 700))
+        pantalla.blit(self.nivel_9,(570, 850))
 
 
 class Ventana_nivel_completado(Ventana):
@@ -123,6 +170,25 @@ class Ventana_nivel_completado(Ventana):
         pantalla.blit(self.texto_usuario,(750, 350))
         pantalla.blit(self.texto_siguiente_nivel,(450, 650))
         pantalla.blit(self.texto_volver_al_menu,(270, 830))
+
+class Ventana_game_over(Ventana):
+    def __init__(self):
+        super().__init__()
+        self.texto_game_over = self.fuente_pausa.render('GAME OVER', True, COLOR_ROJO)
+
+        self.texto_reintentar = self.fuente.render(f'Reintentar', True, COLOR_ROJO)
+        self.rect_texto_reintentar = pygame.Rect((550, 450), (350, 45))
+
+        self.texto_volver_al_menu = self.fuente.render('VOLVER AL MENU PRINCIPAL', True, COLOR_ROJO)
+        self.rect_texto_volver_al_menu = pygame.Rect((270, 650), (900, 45))
+
+    def dibujar(self, pantalla):
+        pygame.draw.rect(self.superficie_transparente, (128, 128, 128, 200), self.rect_transparente)
+        pantalla.blit(self.superficie_transparente, (0,0))
+        
+        pantalla.blit(self.texto_game_over,(300, 100))
+        pantalla.blit(self.texto_reintentar,(550, 450))
+        pantalla.blit(self.texto_volver_al_menu,(270, 650))
 
 class Ventana_pausa(Ventana):
     def __init__(self) -> None:
@@ -174,10 +240,7 @@ class Ventana_ranking(Ventana):
         pantalla.blit(self.texto_volver, (1200, 900))
         for i, jugador in enumerate(lista_mejores_jugadores):
             nombre, puntaje = jugador
-            texto_nivel = self.fuente_barra_datos.render(f'Nivel {i + 1}:         Usuario - {nombre}         Score - {puntaje}', True, COLOR_ROSA)
+            texto_nivel = self.fuente_barra_datos.render(f'Nivel {i}:         Usuario - {nombre}         Score - {puntaje}', True, COLOR_ROSA)
             x = 50
             y = 170 + (i * 80)
             pantalla.blit(texto_nivel, (x, y))
-
-
-
