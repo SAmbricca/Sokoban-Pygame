@@ -30,7 +30,7 @@ class Personaje:
 
         self.mirando = DIRECCION_R
 
-        self.movimientos = 1000
+        self.movimientos = 150
     
     def caminar(self, direccion, lista_cajas, lista_paredes):
         self.mirando = direccion
@@ -73,6 +73,7 @@ class Personaje:
         for caja in lista_cajas:
             if nuevo_rect.colliderect(caja.rect_caja):
                 colision = True
+                self.movimientos -= 1
                 if direccion == DIRECCION_R:
                     caja.mover_caja(DIRECCION_R, lista_cajas, lista_paredes)
                 elif direccion == DIRECCION_L:
@@ -94,20 +95,3 @@ class Personaje:
                 colision = True
                 break
         return colision
-
-'''def animacion_sprite(path, columnas, filas, flip = False):
-    lista = []
-    sup_imagen = pygame.image.load(path)
-    fotograma_ancho = int(sup_imagen.get_width()/columnas)
-    fotograma_alto = int(sup_imagen.get_height()/columnas)
-    x = 0
-    for columna in range(columnas):
-        for fila in range(filas):
-            x = columna * fotograma_ancho
-            y = fila * fotograma_alto
-            sup_fotograma = sup_imagen.subsurface(x, y, fotograma_ancho, fotograma_alto)
-            if flip:
-                sup_fotograma = pygame.transform.flip(sup_fotograma, True, False)
-            lista.append(sup_fotograma)
-    return lista
-'''
