@@ -15,7 +15,6 @@ pygame.mixer.init()
 pantalla = pygame.display.set_mode([ANCHO_VENTANA, ALTO_VENTANA])
 pygame.display.set_caption("Sokoban by Santiago Ambricca")
 pygame.font.init
-texto_elegir_nivel = Escribir(210, 900)
 nombre_usuario = Escribir(1000, 355)
 nombre_usuario_final = ""
 
@@ -30,9 +29,12 @@ numero_nivel = 0
 
 ventana = Ventana()
 ventana_principal = Ventana_principal()
+ventana_seleccion_nivel = Ventana_seleccion_nivel()
 ventana_pausa = Ventana_pausa()
 ventana_nivel = Ventana_nivel()
+ventana_game_over = Ventana_game_over()
 ventana_ranking = Ventana_ranking()
+
 pygame.mixer.music.load("sonidos/puzzlemenu.ogg")
 sonido_nivel_completado = pygame.mixer.Sound("sonidos/nivel_completo.wav")
 sonido_nivel_completado.set_volume(0.01)
@@ -63,17 +65,7 @@ while True:
                 elif ventana_activa == "pausa":
                     tiempo_pausado = False
                     ventana_activa = "nivel"
-
-            elif ventana_activa == "titulo principal":
-                numero_nivel, ventana_activa, bandera_elegir_nivel = texto_elegir_nivel.numero_nivel(eventos, numero_nivel, ventana_activa, bandera_elegir_nivel)
-                if bandera_elegir_nivel:
-                    (personaje, lista_cajas, lista_paredes, lista_objetivos, lista_pisos) = mapa.crear_mapa_nivel(numero_nivel)
-                    tiempo_pausado = False
-                    pygame.mixer.music.stop()
-                    pygame.mixer.music.load("sonidos/nivel.mp3")
-                    bandera_elegir_nivel = False
-                    musica_reproducida = False
-
+                    
             elif ventana_activa == "nivel_completado":
                 nombre_usuario_final = nombre_usuario.nombre_usuario(eventos)
 
@@ -94,19 +86,38 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             posicion_click = list(event.pos)
             if ventana_activa == "titulo principal":
-                if ventana_principal.rect_texto_titulo_ranking.collidepoint(posicion_click):
+                if ventana_principal.rect_texto_titulo_seleccionar_nivel.collidepoint(posicion_click):
+                    ventana_activa = "seleccion nivel"
+
+                elif ventana_principal.rect_texto_titulo_ranking.collidepoint(posicion_click):
                     ventana_activa = "ranking"
             
                 elif ventana_principal.rect_texto_titulo_salir.collidepoint(posicion_click):
                     pygame.quit()
                     sys.exit()
 
+            elif ventana_activa == "seleccion nivel":
+                if ventana_seleccion_nivel.rect_texto_volver.collidepoint(posicion_click):
+                    ventana_activa = "titulo principal"
+
+                for i in range(len(ventana_seleccion_nivel.lista_rects)):
+                    if ventana_seleccion_nivel.lista_rects[i].collidepoint(posicion_click):
+                        contador_segundos = 0
+                        tiempo_inicial = pygame.time.get_ticks()
+                        numero_nivel = i
+                        (personaje, lista_cajas, lista_paredes, lista_objetivos, lista_pisos) = mapa.crear_mapa_nivel(numero_nivel)
+                        ventana_activa = "nivel"
+                        tiempo_pausado = False
+                        pygame.mixer.music.stop()
+                        pygame.mixer.music.load("sonidos/nivel.mp3")
+                        musica_reproducida = False
+                        break
+
             elif ventana_activa == "pausa":
                 if ventana_pausa.rect_texto_continuar.collidepoint(posicion_click):
                     ventana_activa = "nivel"
                 elif ventana_pausa.rect_texto_volver_al_menu.collidepoint(posicion_click):
                     ventana_activa = "titulo principal"
-                    texto_elegir_nivel.caracteres = []
                     pygame.mixer.music.stop()
                     pygame.mixer.music.load("sonidos/puzzlemenu.ogg")
                     musica_reproducida = False
@@ -129,14 +140,32 @@ while True:
                     ventana_activa = "titulo principal"
                     musica_reproducida = False
                     pygame.mixer.music.load("sonidos/puzzlemenu.ogg")
+            
+            elif ventana_activa == "game over":
+                if ventana_game_over.rect_texto_reintentar.collidepoint(posicion_click):
+                    contador_segundos = 0
+                    tiempo_inicial = pygame.time.get_ticks()
+                    (personaje, lista_cajas, lista_paredes, lista_objetivos, lista_pisos) = mapa.crear_mapa_nivel(numero_nivel)
+                    ventana_activa = "nivel"
+                    tiempo_pausado = False
+                    musica_reproducida = False
+
+                elif ventana_game_over.rect_texto_volver_al_menu.collidepoint(posicion_click):
+                    ventana_activa = "titulo principal"
+                    musica_reproducida = False
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load("sonidos/puzzlemenu.ogg")
 
     reloj.tick(FPS)
     if personaje.movimientos == 0:
-        ventana_activa = "nivel_completado"
+        personaje.movimientos = 150
+        ventana_activa = "game over"
 
     if ventana_activa == "titulo principal":
         ventana_principal.dibujar(pantalla)
-        texto_elegir_nivel.mensaje(pantalla, "numero_nivel")
+
+    elif ventana_activa == "seleccion nivel":
+        ventana_seleccion_nivel.dibujar(pantalla)
 
     elif ventana_activa == "nivel":
         ventana_activa = ventana_nivel.dibujar(personaje, lista_cajas, lista_paredes, lista_objetivos, lista_pisos, pantalla, ventana_activa, contador_segundos)
@@ -158,6 +187,11 @@ while True:
         ventana_nivel_completado.dibujar(pantalla)
         nombre_usuario.mensaje(pantalla, "nombre_usuario")
         ventana_nivel_completado.guardar_puntaje(nombre_usuario_final, numero_nivel)
+    
+    elif ventana_activa == "game over":
+        pygame.mixer.music.stop()
+        tiempo_pausado = True
+        ventana_game_over.dibujar(pantalla)
     
     if not musica_reproducida:
         pygame.mixer.music.set_volume(0.08)
